@@ -1,0 +1,40 @@
+<html>
+<meta charset="UTF-8">
+<style>
+	textarea,input {font-size:125%;}
+	.candidate{cursor:pointer;color:brown;border-radius: 10%;border: solid 1px brown}
+</style>
+<body>
+	<textarea rows=5 cols=40>
+aniccucchādanaparimaddanabhedana
+parikkhīṇabhavasaṃyojana
+nāttaparitāpanānuyogamanuyutta
+kammasambhāriñjitapaccaya</textarea>
+	<br/>
+	<input size=60 id="keyword" onkeyup="listcandidate()"></input>
+	<p/>
+	<div id="candidates">
+	</div>
+	<p/>
+	<div id="defination"> </div>
+</body>
+<script src="paliword.bundle.js"></script>
+<script>
+	const checkword=id=>{
+		defination.innerHTML=paliword.getdef(id);
+	}
+	const listcandidate=()=>{
+		const {listCandidate,getentry}=window.paliword;
+		const C=listCandidate(keyword.value.trim());
+
+		C.sort((a,b)=>b[1]-a[1]);
+		let s="";
+		C.forEach(e=>{
+			s+="<span class=candidate onmousemove=checkword("+e[0]+")>";
+			s+=getentry(e[0]);
+			s+="</span> ";
+		})
+		candidates.innerHTML=s;
+	}
+</script>
+</html>

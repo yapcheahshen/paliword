@@ -1,0 +1,1 @@
+cmd/c browserify index.js --bare -s paliword -o paliword.bundle.js

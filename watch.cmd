@@ -1,0 +1,1 @@
+watchify main.js -x paliword -o main.bundle.js

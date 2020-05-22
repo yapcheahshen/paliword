@@ -9,10 +9,19 @@ const bestlen=(w1,w2)=>{
 	}
 	return l;
 };
+const getdef=i=>{
+	if (typeof i=="string") {
+		at=bsearch(palihan,i);
+		return (at>-1)?palihan[at]:'';
+	}
+	return palihan[i];
+}
 const getentry=i=>{
+	if (i>=palihan.length)return '';
 	const at=palihan[i].indexOf(",");
 	return palihan[i].substr(0,at);
 }
+
 const bestmatch=w=>{
 	let at=bsearch(palihan,w,true);
 	let e=getentry(at);
@@ -51,4 +60,52 @@ const breakword=w=>{
 	}
 	return out;
 }
-module.exports={breakword,getentry}
+
+
+const findCandidate=w=>{ 
+	//[dictidx,len]
+	let at=bsearch(palihan,w,true);
+
+	let e=getentry(at);
+	const out=[];
+	if (w==e) {
+		out.push([at,w.length]);
+	}
+
+	let len=0,blen=bestlen(w,e);
+	let best=at;
+	while (best>0) {
+		best--;
+		e=getentry(best);
+		
+		len=bestlen(w,e);
+		const r=len/e.length;
+
+		if (len<4) break;
+
+		if (r>0.75)	out.push([best,len])
+		blen=len;
+	}
+	return out;
+}
+const next=w=>{
+	if (w[0]=="ā") {
+		return "a"+w.substr(1);
+	}
+	return w.substr(1);
+}
+
+const listCandidate=w=>{
+	let out=[];
+	while (w.length>2) {
+		out=out.concat(findCandidate(w));
+		w=next(w);
+	}
+	return out
+}
+
+module.exports={breakword,getentry,getdef,listCandidate}
+
+if (typeof window!=="undefined"){
+	window.paliword={breakword,getentry,getdef,listCandidate};
+}
