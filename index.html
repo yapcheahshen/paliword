@@ -2,39 +2,100 @@
 <meta charset="UTF-8">
 <style>
 	textarea,input {font-size:125%;}
-	.candidate{cursor:pointer;color:brown;border-radius: 10%;border: solid 1px brown}
+	#tokens {cursor:pointer;font-size:150%;font-family: Tahoma}
+	.candidate{cursor:pointer;color:silver;border-bottom:dotted 1px brown}
+	.match {color:#FF8080;}
+	.hi{color:black;}
+	.selected
 </style>
 <body>
-	<textarea rows=5 cols=40>
+	<textarea rows=5 cols=80>
 aniccucchādanaparimaddanabhedana
 parikkhīṇabhavasaṃyojana
 nāttaparitāpanānuyogamanuyutta
-kammasambhāriñjitapaccaya</textarea>
+kammasambhāriñjitapaccaya
+naccagītavāditavisūkadassanāmālāgandhavilepanadhāraṇamaṇḍanavibhūsanaṭṭhānā
+cīvarapiṇḍapātasenāsanagilānapaccayabhesajjaparikkhārānaṃ
+viriyasamādhipadhānasaṅkhārasamannāgataṃiddhipādaṃ
+</textarea>
 	<br/>
-	<input size=60 id="keyword" onkeyup="listcandidate()"></input>
+	<input size=60 id="keyword" onkeyup="keywordchange()"
+	value="naccagītavāditavisūkadassanāmālāgandhavilepanadhāraṇamaṇḍanavibhūsanaṭṭhānā"/><button onclick=clearall()>Clear</button>
 	<p/>
+	<div id="tokens"></div>
 	<div id="candidates">
 	</div>
 	<p/>
 	<div id="defination"> </div>
+	<div id="msg"></div>
 </body>
-<script src="paliword.bundle.js"></script>
-<script>
-	const checkword=id=>{
-		defination.innerHTML=paliword.getdef(id);
-	}
-	const listcandidate=()=>{
-		const {listCandidate,getentry}=window.paliword;
-		const C=listCandidate(keyword.value.trim());
 
-		C.sort((a,b)=>b[1]-a[1]);
+<script src="bsearch.js"></script>
+<script src="palihan.js"></script>
+<script src="index.js"></script>
+<script>
+	let Candidates=[];
+	let selectedword=0;
+	const checkword=i=>{
+		if (i==selectedword) return;
+		selectedword=i;
+		const c=Candidates[i];
+		defination.innerHTML=paliword.getdef(c[0]);
+		keywordchange(c[1],c[1]+c[2])
+	}
+	const keywordchange=(from,to)=>{
+		if (typeof from=="undefined")from=-1;
+		if (typeof to=="undefined")to=-1;
+		const k=document.getElementById("keyword").value.trim();
+		const arr=keyword.value.trim().split("");
+		let s="";
+		arr.forEach((tk,idx)=>{
+			let cls=""
+			if (idx>=from&&idx<to) cls="match";
+			s+="<span onmouseenter=selecttoken("+idx+") class="+cls+">"+tk+"</span>";
+		});
+		document.getElementById("tokens").innerHTML=s;
+		Candidates=paliword.listCandidate(k);
+		//selecttoken(0)
+	}
+	/*
+	async function paste () {
+		const t= await navigator.clipboard.readText();
+		keyword.value=t;		
+	}
+
+
+	const paste=()=>{
+		keyword.focus();
+		keyword.setSelectionRange(0,keyword.value.length);
+		setTimeout(()=>{
+			document.execCommand("Paste");
+		},0);
+	}
+	*/
+	const clearall=()=>{
+		keyword.focus();
+		keyword.value="";
+	}
+	const selecttoken=(idx)=>{
+		const C=Candidates.filter(c=>c[1]<=idx&& (c[1]+c[2]>idx) );
+		C.sort((a,b)=>{
+			a[1]-b[1]
+		});
 		let s="";
 		C.forEach(e=>{
-			s+="<span class=candidate onmousemove=checkword("+e[0]+")>";
-			s+=getentry(e[0]);
+			s+="<span class=candidate onmouseenter=checkword("+e[3]+")>";
+			const ent=paliword.getheadword(e[0]);
+			s+="<span class=hi>"+ent.substr(0,e[2])+"</span>"
+			+ent.substr(e[2]);
 			s+="</span> ";
 		})
-		candidates.innerHTML=s;
+		document.getElementById("candidates").innerHTML=s;
+		msg.innerHTML=C[0];
+		if (C[0]) checkword(C[0][3]);
+	}
+	if (document.getElementById("keyword").value.trim()) {
+		keywordchange();
 	}
 </script>
 </html>

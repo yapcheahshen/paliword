@@ -1,4 +1,4 @@
-const {breakword,getentry,listCandidate}=require("./index");
+const {breakword,getheadword,listCandidate}=require("./index");
 const testdata=[
 //["ucchādana","ucchādana"]
 //,["aniccucchādanaparimaddanabhedana","anicc-ucchādana-parimaddana-bhedana"]
@@ -29,7 +29,7 @@ const testbreakword=D=>{
 const testlistCandidate=D=>{
 	D.forEach(d=>{
 		const o=listCandidate(d[0]);
-		const entries=o.map(item=>[getentry(item[0]),item[1]]);
+		const entries=o.map(item=>[getheadword(item[0]),item[1]]);
 		entries.sort((a,b)=>b[1]-a[1])
 		console.log(d[0]);
 		console.log(entries.join("\n"))
