@@ -2,10 +2,11 @@
 <meta charset="UTF-8">
 <style>
 	textarea,input {font-size:125%;}
-	#tokens {cursor:pointer;font-size:150%;font-family: Tahoma}
+	#tokens {cursor:pointer;font-size:140%;font-family: Tahoma}
 	.candidate{cursor:pointer;color:silver;border-bottom:dotted 1px brown}
 	.match {color:#FF8080;}
 	.hi{color:black;}
+	.split{border-right:solid 2px brown;}
 	.selected
 </style>
 <body>
@@ -36,27 +37,34 @@ viriyasamādhipadhānasaṅkhārasamannāgataṃiddhipādaṃ
 <script>
 	let Candidates=[];
 	let selectedword=0;
+	let splitat=[];
+	let match_from=0,match_to=-1;
 	const checkword=i=>{
 		if (i==selectedword) return;
 		selectedword=i;
 		const c=Candidates[i];
 		defination.innerHTML=paliword.getdef(c[0]);
-		keywordchange(c[1],c[1]+c[2])
+		match_from=c[1];
+		match_to=c[1]+c[2];
+		renderkeyword();
 	}
-	const keywordchange=(from,to)=>{
-		if (typeof from=="undefined")from=-1;
-		if (typeof to=="undefined")to=-1;
-		const k=document.getElementById("keyword").value.trim();
+	const renderkeyword=()=>{		
 		const arr=keyword.value.trim().split("");
 		let s="";
 		arr.forEach((tk,idx)=>{
 			let cls=""
-			if (idx>=from&&idx<to) cls="match";
-			s+="<span onmouseenter=selecttoken("+idx+") class="+cls+">"+tk+"</span>";
+			if (idx>=match_from&&idx<match_to) cls="match";
+			//if (splitat[idx]) cls+=' split';
+			if (splitat[idx])tk+="-"
+			s+="<span onclick=splitword("+idx+") onmouseenter=selecttoken("+idx+") class='"+cls+"'>"+tk+"</span>";
 		});
-		document.getElementById("tokens").innerHTML=s;
+		document.getElementById("tokens").innerHTML=s;		
+	}
+	const keywordchange=(from,to)=>{
+		const k=document.getElementById("keyword").value.trim();
 		Candidates=paliword.listCandidate(k);
-		//selecttoken(0)
+		renderkeyword();
+		splitat=[];
 	}
 	/*
 	async function paste () {
@@ -77,6 +85,10 @@ viriyasamādhipadhānasaṅkhārasamannāgataṃiddhipādaṃ
 		keyword.focus();
 		keyword.value="";
 	}
+	const splitword=i=>{
+		splitat[i]=!splitat[i];
+		renderkeyword();
+	}
 	const selecttoken=(idx)=>{
 		const C=Candidates.filter(c=>c[1]<=idx&& (c[1]+c[2]>idx) );
 		C.sort((a,b)=>{
@@ -84,7 +96,8 @@ viriyasamādhipadhānasaṅkhārasamannāgataṃiddhipādaṃ
 		});
 		let s="";
 		C.forEach(e=>{
-			s+="<span class=candidate onmouseenter=checkword("+e[3]+")>";
+			s+="<span class=candidate "
+			+"onmouseenter=checkword("+e[3]+")>";
 			const ent=paliword.getheadword(e[0]);
 			s+="<span class=hi>"+ent.substr(0,e[2])+"</span>"
 			+ent.substr(e[2]);
