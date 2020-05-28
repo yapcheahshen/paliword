@@ -13,7 +13,7 @@ const extract=()=>{
 			w=w.replace(/ṁ/g,"ṃ");
 			const items=w.split(/,/);
 			items[0]=items[0].toLowerCase();
-			ccped.push( items.join(","));
+			ccped.push( items.join("="));
 		}
 	}
 	//remove repeated
@@ -27,9 +27,9 @@ const extract=()=>{
 	
 	console.log("output palihan.js repeat entries:",ccped.length-out.length)
 
-
+	const exportto='if (typeof window!="undefined")window.palilexicon=palihan;else module.export=palihan;'
 	fs.writeFileSync("palihan.js",
-		"module.exports=`"+out.join("\n")+"`","utf8");
+		"const palihan=`"+out.join("\n")+"`.split(/\\r?\\n/);\n"+exportto,"utf8");
 }
 
 extract()

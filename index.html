@@ -15,24 +15,30 @@ aniccucchādanaparimaddanabhedana
 parikkhīṇabhavasaṃyojana
 nāttaparitāpanānuyogamanuyutta
 kammasambhāriñjitapaccaya
+anuyogamanuyutta
 naccagītavāditavisūkadassanāmālāgandhavilepanadhāraṇamaṇḍanavibhūsanaṭṭhānā
 cīvarapiṇḍapātasenāsanagilānapaccayabhesajjaparikkhārānaṃ
 viriyasamādhipadhānasaṅkhārasamannāgataṃiddhipādaṃ
+mahāpurisalakkhaṇesu
 </textarea>
 	<br/>
 	<input size=60 id="keyword" onkeyup="keywordchange()"
-	value="naccagītavāditavisūkadassanāmālāgandhavilepanadhāraṇamaṇḍanavibhūsanaṭṭhānā"/><button onclick=clearall()>Clear</button>
+	value="anuyogamanuyutta"/><button onclick=clearall()>Clear</button>
 	<p/>
+	<div id="candidates"></div>
 	<div id="tokens"></div>
-	<div id="candidates">
-	</div>
+	<div id="suggestion"></div>
+	
+	
 	<p/>
 	<div id="defination"> </div>
+
 	<div id="msg"></div>
 </body>
 
 <script src="bsearch.js"></script>
 <script src="palihan.js"></script>
+<script src="lexicon-solo.js"></script>
 <script src="index.js"></script>
 <script>
 	let Candidates=[];
@@ -43,13 +49,14 @@ viriyasamādhipadhānasaṅkhārasamannāgataṃiddhipādaṃ
 		if (i==selectedword) return;
 		selectedword=i;
 		const c=Candidates[i];
+		if (!c)return;
 		defination.innerHTML=paliword.getdef(c[0]);
 		match_from=c[1];
 		match_to=c[1]+c[2];
 		renderkeyword();
 	}
 	const renderkeyword=()=>{		
-		const arr=keyword.value.trim().split("");
+		const arr=keyword.value.trim().replace(/-/g,"").split("");
 		let s="";
 		arr.forEach((tk,idx)=>{
 			let cls=""
@@ -60,9 +67,19 @@ viriyasamādhipadhānasaṅkhārasamannāgataṃiddhipādaṃ
 		});
 		document.getElementById("tokens").innerHTML=s;		
 	}
+	
 	const keywordchange=(from,to)=>{
-		const k=document.getElementById("keyword").value.trim();
+		const k=document.getElementById("keyword").value.trim().replace(/-/g,"");
 		Candidates=paliword.listCandidate(k);
+
+		const suggestion=paliword.suggestedBreak(k,Candidates);
+
+		const out=suggestion.map((item,idx)=>{
+			return (idx?'-':'')+'<span onmouseenter=checkword('+item[1]+') class="candidate'+(item[1]>-1?' hi':'')+'">'+item[0]+'</span>';
+		})
+
+		document.getElementById("suggestion").innerHTML=out.join("");
+
 		renderkeyword();
 		splitat=[];
 	}
