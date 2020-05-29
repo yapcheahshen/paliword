@@ -120,27 +120,27 @@ const suffix=[
 ]*/
 
 const suffix=[
-[/issa$/,''],
-[/assa$/,''],
+[/ssa$/,''],
 [/tabba$/,''],
 [/eyyaṃ$/,''],
 [/eyyam$/,''],
 [/eyyasi$/,''],
 [/eyya$/,''],
 [/esu$/,''],
-[/itvā$/,''],
-[/ituṃ$/,''],
+[/tuṃ$/,''],
 [/tvā$/,''],
 [/etvā$/,''],
 [/etha$/,''],
-[/iṃsu$/,''],
+[/ṃsu$/,''],
 [/nta$/,''],
 [/ehi$/,''],
 [/ena$/,''],
 [/āya$/,''],
 [/ayo$/,''],
 [/āna$/,''],
+[/anaṃ$/,''],
 [/ānaṃ$/,''],
+[/naṃ$/,''],
 [/smiṃ$/,''],
 [/ūnaṃ$/,''],
 [/mi$/,'t'],
@@ -311,7 +311,8 @@ const suggestedBreak=(w,candidates)=>{
 	}
 	s+=w.substr(i);
 	for (var j=0;j<suffix.length&&s.length&&out.length;j++){
-		if (s.match(suffix[j][0])){ //dirty hack
+		const m=s.match(suffix[j][0]);
+		if (m==s){ //dirty hack
 			const b=out[out.length-1];
 			b[0]+=s;
 			b[1][2]+=s.length;
