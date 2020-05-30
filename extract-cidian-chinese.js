@@ -29,7 +29,7 @@ const extract=()=>{
 
 	const exportto='if (typeof window!="undefined")window.palilexicon=palihan;else module.export=palihan;'
 	fs.writeFileSync("palihan.js",
-		"const palihan=`"+out.join("\n")+"`.split(/\\r?\\n/);\n"+exportto,"utf8");
+		"const palihan=`"+out.join("\n")+"`.split(/\\r?\\n/).sort((a,b)=>(a==b)?0:((a>b)?1:-1));\n"+exportto,"utf8");
 }
 
 extract()
