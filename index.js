@@ -17,7 +17,8 @@ const bestlen=(w1,w2)=>{
 const getdef=i=>{
 	if (typeof i=="string") {
 		at=bsearch(palihan,i);
-		return (at>-1)?palihan[at]:'';
+		let r=(at>-1)?r:'';
+		return r;
 	}
 	return palihan[i];
 }
@@ -26,6 +27,7 @@ const ENTRY_SEPARATOR="="
 const getheadword=i=>{
 	if (i>=palilexicon.length)return '';
 	const at=palilexicon[i].indexOf(ENTRY_SEPARATOR);
+	if (at==-1)return palilexicon[i];
 	return palilexicon[i].substr(0,at);
 }
 
@@ -121,34 +123,44 @@ const suffix=[
 
 const suffix=[
 [/ssa$/,''],
+[/tabbaṃ$/,''],
 [/tabba$/,''],
-[/eyyaṃ$/,''],
-[/eyyam$/,''],
-[/eyyasi$/,''],
-[/eyya$/,''],
+[/enti$/,'a'],
+[/eyyaṃ$/,'ati'],
+[/eyyam$/,'ati'],
+[/eyyasi$/,'ati'],
+[/eyya$/,'ati'],
 [/esu$/,''],
 [/tuṃ$/,''],
+[/smā$/,''],
 [/tvā$/,''],
 [/etvā$/,''],
 [/etha$/,''],
 [/ṃsu$/,''],
 [/nta$/,''],
-[/ehi$/,''],
-[/ena$/,''],
-[/āya$/,''],
+[/nti$/,''],
+[/ehi$/,'a'],
+[/ena$/,'a'],
+[/āti$/,'ati'],
+[/āya$/,'a'],
 [/ayo$/,''],
 [/āna$/,''],
-[/anaṃ$/,''],
-[/ānaṃ$/,''],
+[/īnaṃ$/,'i'],
+[/anaṃ$/,'a'],
+[/ānaṃ$/,'a'],
 [/naṃ$/,''],
 [/smiṃ$/,''],
 [/ūnaṃ$/,''],
-[/mi$/,'t'],
-[/si$/,'t'],
+[/mi$/,'ti'],
+[/si$/,'ti'],
 [/aṃ$/,''],
-[/[aāeiīūou]?$/,''],
+[/ā$/,'a'],
+[/[aāeiīūou]?$/,'a'],
 [/ṃ$/,'']
 ];
+const trimheadword=hw=>{
+	return hw.replace(/[@\+].+/,'');
+}
 const stem=w=>{
 	let s=w;
 	for (var i=0;i<suffix.length;i++){
@@ -160,15 +172,12 @@ const stem=w=>{
 	return w;
 }
 const findCandidate=n=>{ 
-	//[dictidx,len]
-
-
 	const w=n[0],offset=n[1];
 	let at=bsearch(palilexicon,w,true);
 
 	let e=getheadword(at);
 	const out=[];
-	if (w==e) {
+	if (w==e ){//|| stem(w)==e) {
 		out.push([at,offset,w.length]);
 	}
 
@@ -192,7 +201,9 @@ const findCandidate=n=>{
 		//if (len+3>=e.length) out.push([best,offset,len])
 		if (len==e.length) {
 		  out.push([best,offset,len])//full match
-		} else if (stem(w)==stem(e)) {
+		} else if (w==trimheadword(e)) {
+			out.push([best,offset,w.length]); //stem match
+		} else if (stem(w)==trimheadword(e) || stem(w)==e) {
 			out.push([best,offset,w.length]); //stem match
 		} else if (matchend(w.substr(0,len),e)){
 			out.push([best,offset,len]); //"anicc"u ==> anicca
@@ -201,14 +212,21 @@ const findCandidate=n=>{
 		blen=len;
 		best--;
 	}
+	//printmatch(out);
 	return out;
 }
-
+const printmatch=arr=>{
+	if (!arr.length)return;
+	console.log(arr.map(item=>getheadword(item[0])).join());
+}
 
 // ābcdefghi...
 // abcdefghi...
 //  bcdefghi...
 //   cdefghi...
+const validprefix={
+	a:true,u:true,o:true,su:true,du:true,an:true,na:true
+}
 const listCandidate=w=>{
 	//move on ch forward, break sandhi 
 	w=w.toLowerCase();
@@ -227,8 +245,17 @@ const listCandidate=w=>{
 	}
 
 	for (var i=0;i<out.length;i++) {
+		//filter impossible
 		out[i][3]=i; //keep the array index, easy access after Array.filter
 	}
+
+	out=out.filter(item=>{
+		if (item[1]>0 && item[1]<3) {
+			const pf=w.substr(0,item[1]);
+			return validprefix[pf] 
+		}
+		return true;
+	});
 	
 	return out
 }
