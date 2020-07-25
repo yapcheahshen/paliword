@@ -350,7 +350,8 @@ const suggestedBreak=(w,candidates)=>{
 	if (s)out.push([s,-1]);	
 	return out;
 }
-const ex={breakword,getheadword,getdef,listCandidate,suggestedBreak}
+const setLexicon=lex=>palilexicon=lex;
+const ex={breakword,getheadword,getdef,listCandidate,suggestedBreak,setLexicon}
 if (typeof module!=="undefined") {
 	module.exports=	ex
 }
